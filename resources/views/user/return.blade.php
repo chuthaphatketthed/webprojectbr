@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="container mx-auto p-4">
-    <h1 class="text-2xl font-bold mb-4">Return Equipment</h1>
+    <h1 class="text-2xl font-bold mb-4">คืนครุภัณฑ์</h1>
 
     <!-- Flash Messages -->
     @if (session('success'))
@@ -25,7 +25,7 @@
         @csrf
 
         <div>
-            <label for="id" class="block text-sm font-medium text-gray-700">Equipment:</label>
+            <label for="id" class="block text-sm font-medium text-gray-700">เลือกครุภัณฑ์ที่ต้องการคืน:</label>
             <select name="id" id="id" required class="border border-gray-300 px-3 py-2 rounded w-full focus:ring-2 focus:ring-blue-500">
                 @foreach ($borrowedItems as $item)
                     <option value="{{ $item->id }}">{{ $item->equipment->name }}</option>
@@ -34,12 +34,12 @@
         </div>
 
         <div>
-            <label for="return_proof" class="block text-sm font-medium text-gray-700">Upload Return Proof:</label>
+            <label for="return_proof" class="block text-sm font-medium text-gray-700">อัปโหลดหลักฐานการคืน:</label>
             <input type="file" name="return_proof" id="return_proof" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
         </div>
 
         <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
-            Submit Return
+            ส่งข้อมูลการคืน
         </button>
     </form>
 </div>

@@ -31,6 +31,9 @@ Route::middleware(['auth', 'role:user'])->group(function () {
     Route::post('/user/return', [UserController::class, 'return'])->name('user.return');
     Route::get('/user/history', [UserController::class, 'history'])->name('user.history');
     Route::get('/user/return/{id}', [UserController::class, 'showReturnForm'])->name('user.return.form');
+    Route::get('/user/report/damage', [UserController::class, 'showReportDamageForm'])->name('user.report.damage.form');
+    Route::post('/user/report/damage', [UserController::class, 'reportDamage'])->name('user.report.damage');
+    
 
     // แสดงคำขอที่รออนุมัติ
     Route::get('/user/pending', [UserController::class, 'pendingRequests'])->name('user.pending');
@@ -40,7 +43,6 @@ Route::middleware(['auth', 'role:user'])->group(function () {
     Route::put('/user/pending/update/{id}', [UserController::class, 'updatePendingRequest'])->name('user.pending.update');
     Route::delete('/user/pending/cancel/{id}', [UserController::class, 'cancelRequest'])->name('user.pending.cancel');
     Route::get('/user/history/pdf', [UserController::class, 'exportHistoryAsPDF'])->name('user.history.pdf');
-    
 });
 
 
@@ -56,6 +58,9 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::delete('/admin/equipment/{id}', [AdminController::class, 'destroy'])->name('admin.equipment.destroy');
     Route::put('/admin/equipment/{id}', [AdminController::class, 'update'])->name('admin.equipment.update');
     Route::patch('/admin/reject/{id}', [AdminController::class, 'reject'])->name('admin.reject');
+    Route::get('/admin/damage/requests', [AdminController::class, 'showDamageRequests'])->name('admin.damage.requests');
+    Route::patch('/admin/damage/approve/{id}', [AdminController::class, 'approveDamageRequest'])->name('admin.damage.approve');
+    Route::patch('/admin/damage/reject/{id}', [AdminController::class, 'rejectDamageRequest'])->name('admin.damage.reject');
 });
 
 // Route สำหรับโปรไฟล์

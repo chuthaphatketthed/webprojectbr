@@ -29,6 +29,8 @@
                         อนุมติแล้ว
                     @elseif ($request->status === 'rejected')
                         ปฏิเสธคำขอ
+                    @elseif ($request->status === 'damage_pending')
+                        รอการตรวจสอบการชำรุด
                     @else
                         {{ ucfirst($request->status) }}
                     @endif

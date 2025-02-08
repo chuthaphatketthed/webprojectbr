@@ -112,4 +112,25 @@ class AdminController extends Controller
 
         return redirect()->route('admin.approval')->with('error', 'ไม่สามารถปฏิเสธคำขอนี้ได้');
     }
+    public function showDamageRequests()
+    {
+        $damageRequests = BorrowRequest::where('status', 'damage_pending')->with('equipment')->get();
+        return view('admin.damage_requests', compact('damageRequests'));
+    }
+
+    public function approveDamageRequest($id)
+    {
+        $request = BorrowRequest::findOrFail($id);
+        $request->update(['status' => 'damage_approved']);
+
+        return redirect()->route('admin.damage.requests')->with('success', 'ยืนยันคำร้องชำรุดเรียบร้อยแล้ว');
+    }
+
+    public function rejectDamageRequest($id)
+    {
+        $request = BorrowRequest::findOrFail($id);
+        $request->update(['status' => 'damage_rejected']);
+
+        return redirect()->route('admin.damage.requests')->with('success', 'ปฏิเสธคำร้องชำรุดเรียบร้อยแล้ว');
+    }
 }

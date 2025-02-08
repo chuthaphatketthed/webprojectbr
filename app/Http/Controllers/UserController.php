@@ -6,7 +6,6 @@ use Illuminate\Http\Request;
 use App\Models\Equipment;
 use App\Models\BorrowRequest;
 use Illuminate\Support\Facades\Auth;
-use Barryvdh\DomPDF\Facade as PDF;
 
 
 class UserController extends Controller
@@ -153,15 +152,38 @@ class UserController extends Controller
 
         return redirect()->route('user.pending')->with('error', 'ไม่สามารถยกเลิกคำขอนี้ได้');
     }
-    public function exportHistoryAsPDF()
+    public function reportDamage(Request $request)
     {
-        // ดึงข้อมูลการยืม-คืนจากฐานข้อมูล
-        $borrowRequests = BorrowRequest::where('user_id', auth()->id())->get();
+        $request->validate([
+            'equipment_id' => 'required|exists:equipment,id',
+            'description' => 'required|string|max:500',
+            'image' => 'required|image|mimes:jpeg,png,jpg|max:2048',
+        ]);
 
-        // สร้าง PDF จาก View `user.history`
-        $pdf = PDF::loadView('user.history', compact('borrowRequests'));
+        $imagePath = $request->file('image')->store('damage_reports');
 
-        // ดาวน์โหลดไฟล์ PDF
-        return $pdf->download('borrow_history.pdf');
+        BorrowRequest::create([
+            'user_id' => Auth::id(),
+            'equipment_id' => $request->equipment_id,
+            'status' => 'damage_pending',
+            'description' => $request->description,
+            'image_path' => $imagePath,
+        ]);
+
+        return redirect()->route('user.history')->with('success', 'แจ้งชำรุดเรียบร้อยแล้ว');
+    }
+    public function showReportDamageForm()
+    {
+        $equipments = Equipment::all();
+        return view('user.report_damage', compact('equipments'));
+    }
+    public function showReturnForm($id)
+    {
+        // ดึงข้อมูลคำขอยืมของผู้ใช้ที่กำลังล็อกอิน
+        $borrowedItems = BorrowRequest::where('user_id', Auth::id())
+            ->where('status', 'approved') // เฉพาะคำขอที่อนุมัติแล้ว
+            ->get();
+
+        return view('user.return', compact('borrowedItems'));
     }
 }
