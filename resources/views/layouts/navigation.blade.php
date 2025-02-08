@@ -12,7 +12,7 @@
 
                 <!-- Navigation Links -->
                 <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
-                    <!-- Links for Admin -->
+                    <!-- Admin Links -->
                     @if (Auth::check() && Auth::user()->role === 'admin')
                         <x-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard')">
                             {{ __('หน้าหลัก') }}
@@ -23,9 +23,12 @@
                         <x-nav-link :href="route('admin.borrow.history')" :active="request()->routeIs('admin.borrow.history')">
                             {{ __('ประวัติการยืม-คืนครุภัณฑ์') }}
                         </x-nav-link>
+                        <x-nav-link :href="route('admin.damage.requests')" :active="request()->routeIs('admin.damage.requests')">
+                            {{ __('คำร้องขอแจ้งชำรุด') }}
+                        </x-nav-link>
                     @endif
 
-                    <!-- Links for User -->
+                    <!-- User Links -->
                     @if (Auth::check() && Auth::user()->role === 'user')
                         <x-nav-link :href="route('user.equipment')" :active="request()->routeIs('user.equipment')">
                             {{ __('ครุภัณฑ์ที่มีให้ยืม') }}
@@ -90,7 +93,7 @@
     <!-- Responsive Navigation Menu -->
     <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
         <div class="pt-2 pb-3 space-y-1">
-            <!-- Links for Admin -->
+            <!-- Admin Links -->
             @if (Auth::check() && Auth::user()->role === 'admin')
                 <x-responsive-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard')">
                     {{ __('หน้าหลัก') }}
@@ -101,9 +104,12 @@
                 <x-responsive-nav-link :href="route('admin.borrow.history')" :active="request()->routeIs('admin.borrow.history')">
                     {{ __('ประวัติการยืม-คืนครุภัณฑ์') }}
                 </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('admin.damage.requests')" :active="request()->routeIs('admin.damage.requests')">
+                    {{ __('คำร้องขอแจ้งชำรุด') }}
+                </x-responsive-nav-link>
             @endif
 
-            <!-- Links for User -->
+            <!-- User Links -->
             @if (Auth::check() && Auth::user()->role === 'user')
                 <x-responsive-nav-link :href="route('user.equipment')" :active="request()->routeIs('user.equipment')">
                     {{ __('ครุภัณฑ์ที่มีให้ยืม') }}
@@ -118,31 +124,6 @@
                     {{ __('แจ้งชำรุด') }}
                 </x-responsive-nav-link>
             @endif
-        </div>
-
-        <!-- Responsive Settings Options -->
-        <div class="pt-4 pb-1 border-t border-gray-200">
-            <div class="px-4">
-                <div class="font-medium text-base text-gray-800">{{ Auth::user()->name }}</div>
-                <div class="font-medium text-sm text-gray-500">{{ Auth::user()->email }}</div>
-            </div>
-
-            <div class="mt-3 space-y-1">
-                <x-responsive-nav-link :href="route('profile.edit')">
-                    {{ __('โปรไฟล์') }}
-                </x-responsive-nav-link>
-
-                <!-- Authentication -->
-                <form method="POST" action="{{ route('logout') }}">
-                    @csrf
-
-                    <x-responsive-nav-link :href="route('logout')"
-                            onclick="event.preventDefault();
-                                        this.closest('form').submit();">
-                        {{ __('ออกจากระบบ') }}
-                    </x-responsive-nav-link>
-                </form>
-            </div>
         </div>
     </div>
 </nav>
