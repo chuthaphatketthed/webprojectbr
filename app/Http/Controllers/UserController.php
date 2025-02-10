@@ -7,7 +7,6 @@ use App\Models\Equipment;
 use App\Models\BorrowRequest;
 use Illuminate\Support\Facades\Auth;
 
-
 class UserController extends Controller
 {
     // แสดงรายการอุปกรณ์ทั้งหมด
@@ -72,10 +71,18 @@ class UserController extends Controller
         return redirect()->route('user.history')->with('success', 'การคืนอุปกรณ์เสร็จสมบูรณ์');
     }
 
-    // แสดงประวัติการยืม
-    public function history()
+    // แสดงประวัติการยืมพร้อมกรองสถานะ
+    public function history(Request $request)
     {
-        $borrowRequests = BorrowRequest::where('user_id', Auth::id())->get();
+        $query = BorrowRequest::where('user_id', Auth::id());
+
+        // กรองสถานะถ้ามีการเลือก และไม่ใช่ "ทั้งหมด"
+        if ($request->has('status') && $request->status !== '') {
+            $query->where('status', $request->status);
+        }
+
+        $borrowRequests = $query->get();
+
         return view('user.history', compact('borrowRequests'));
     }
 
@@ -96,7 +103,7 @@ class UserController extends Controller
             ->where('status', 'pending')
             ->firstOrFail();
 
-        return view('user.pending.edit', compact('borrowRequest'));
+        return view('user.pending_edit', compact('borrowRequest'));
     }
 
     // อัปเดตคำขอที่รออนุมัติ
@@ -114,18 +121,13 @@ class UserController extends Controller
         $equipment = Equipment::findOrFail($borrowRequest->equipment_id);
 
         // อัปเดตจำนวนคงเหลือในอุปกรณ์
-        if ($request->quantity > $borrowRequest->quantity) {
-            $difference = $request->quantity - $borrowRequest->quantity;
-
-            if ($equipment->quantity < $difference) {
-                return redirect()->back()->withErrors(['quantity' => 'จำนวนอุปกรณ์ไม่เพียงพอ']);
-            }
-
-            $equipment->decrement('quantity', $difference);
-        } else {
-            $difference = $borrowRequest->quantity - $request->quantity;
-            $equipment->increment('quantity', $difference);
+        $difference = $request->quantity - $borrowRequest->quantity;
+        if ($difference > 0 && $equipment->quantity < $difference) {
+            return redirect()->back()->withErrors(['quantity' => 'จำนวนอุปกรณ์ไม่เพียงพอ']);
         }
+
+        $equipment->decrement('quantity', max($difference, 0));
+        $equipment->increment('quantity', max(-$difference, 0));
 
         $borrowRequest->update([
             'quantity' => $request->input('quantity'),
@@ -152,6 +154,8 @@ class UserController extends Controller
 
         return redirect()->route('user.pending')->with('error', 'ไม่สามารถยกเลิกคำขอนี้ได้');
     }
+
+    // แจ้งอุปกรณ์ชำรุด
     public function reportDamage(Request $request)
     {
         $request->validate([
@@ -172,18 +176,11 @@ class UserController extends Controller
 
         return redirect()->route('user.history')->with('success', 'แจ้งชำรุดเรียบร้อยแล้ว');
     }
+
+    // แสดงฟอร์มแจ้งอุปกรณ์ชำรุด
     public function showReportDamageForm()
     {
         $equipments = Equipment::all();
         return view('user.report_damage', compact('equipments'));
-    }
-    public function showReturnForm($id)
-    {
-        // ดึงข้อมูลคำขอยืมของผู้ใช้ที่กำลังล็อกอิน
-        $borrowedItems = BorrowRequest::where('user_id', Auth::id())
-            ->where('status', 'approved') // เฉพาะคำขอที่อนุมัติแล้ว
-            ->get();
-
-        return view('user.return', compact('borrowedItems'));
     }
 }

@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
+use App\Models\BorrowRequest;
 
 class ProfileController extends Controller
 {
@@ -16,8 +17,13 @@ class ProfileController extends Controller
      */
     public function edit(Request $request): View
     {
+        $currentBorrows = BorrowRequest::where('user_id', $request->user()->id)
+            ->where('status', 'approved') // เฉพาะคำขอยืมที่ได้รับการอนุมัติ
+            ->get();
+
         return view('profile.edit', [
             'user' => $request->user(),
+            'currentBorrows' => $currentBorrows, // ส่งข้อมูลรายการยืมไปยัง View
         ]);
     }
 
@@ -26,8 +32,15 @@ class ProfileController extends Controller
      */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
-        $request->user()->fill($request->validated());
+        // อัปเดตข้อมูลผู้ใช้
+        $request->user()->fill([
+            'name' => $request->input('name'),
+            'email' => $request->input('email'),
+            'phone_number' => $request->input('phone_number'),
+            'address' => $request->input('address'),
+        ]);
 
+        // รีเซ็ตการยืนยันอีเมลหากมีการเปลี่ยนแปลง
         if ($request->user()->isDirty('email')) {
             $request->user()->email_verified_at = null;
         }
@@ -57,6 +70,10 @@ class ProfileController extends Controller
 
         return Redirect::to('/');
     }
+
+    /**
+     * Validation rules for updating the user's profile.
+     */
     public function rules()
     {
         return [

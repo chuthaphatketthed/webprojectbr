@@ -30,9 +30,9 @@
         <tbody>
             @foreach ($equipments as $equipment)
             <tr class="hover:bg-gray-100">
-                <td class="border border-gray-300 px-4 py-2">{{ $equipment->id }}</td>
+                <td class="border border-gray-300 px-4 py-2 text-center">{{ $equipment->id }}</td>
                 <td class="border border-gray-300 px-4 py-2">{{ $equipment->name }}</td>
-                <td class="border border-gray-300 px-4 py-2">{{ $equipment->quantity }}</td>
+                <td class="border border-gray-300 px-4 py-2 text-center">{{ $equipment->quantity }}</td>
                 <td class="border border-gray-300 px-4 py-2">{{ $equipment->details }}</td>
                 <td class="border border-gray-300 px-4 py-2">
                     <div class="flex flex-col space-y-2">

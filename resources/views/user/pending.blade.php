@@ -32,12 +32,14 @@
                     {{ $request->status === 'pending' ? 'รออนุมัติ' : 'สถานะอื่น' }}
                 </td>
                 <td class="border border-gray-300 px-4 py-2 flex space-x-2 justify-center">
-                    <!-- ปุ่มแก้ไข -->
-                    <a href="{{ route('user.pending.edit', $request->id) }}" 
-                       class="bg-yellow-500 text-white text-sm px-3 py-1 rounded hover:bg-yellow-600">
-                        แก้ไข
-                    </a>
-                    <!-- ปุ่มไม่ต้องการยืมแล้ว -->
+                    <!-- แก้ไขคำขอ -->
+                    <form method="GET" action="{{ route('user.pending.edit', $request->id) }}">
+                        <button type="submit" 
+                                class="bg-yellow-500 text-white text-sm px-3 py-1 rounded hover:bg-yellow-600">
+                            แก้ไข
+                        </button>
+                    </form>
+                    <!-- ยกเลิกคำขอ -->
                     <form method="POST" action="{{ route('user.pending.cancel', $request->id) }}" 
                           onsubmit="return confirm('คุณต้องการยกเลิกคำขอนี้หรือไม่?')">
                         @csrf

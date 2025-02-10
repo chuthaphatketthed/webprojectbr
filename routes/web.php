@@ -32,8 +32,13 @@ Route::middleware(['auth', 'role:user'])->prefix('user')->name('user.')->group(f
     Route::get('/return/{id}', [UserController::class, 'showReturnForm'])->name('return.form');
     Route::get('/report/damage', [UserController::class, 'showReportDamageForm'])->name('report.damage.form');
     Route::post('/report/damage', [UserController::class, 'reportDamage'])->name('report.damage');
-    Route::get('/pending', [UserController::class, 'pendingRequests'])->name('pending');
     Route::get('/history/pdf', [UserController::class, 'exportHistoryAsPDF'])->name('history.pdf');
+    Route::get('/pending', [UserController::class, 'pendingRequests'])->name('pending');
+    Route::put('/pending/update/{id}', [UserController::class, 'updatePendingRequest'])->name('pending.update');
+    Route::delete('/pending/cancel/{id}', [UserController::class, 'cancelRequest'])->name('pending.cancel');
+    Route::get('/pending/edit/{id}', [UserController::class, 'editPendingRequest'])->name('pending.edit');
+
+
 });
 
 // Route สำหรับ Admin
