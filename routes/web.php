@@ -34,11 +34,10 @@ Route::middleware(['auth', 'role:user'])->prefix('user')->name('user.')->group(f
     Route::post('/report/damage', [UserController::class, 'reportDamage'])->name('report.damage');
     Route::get('/history/pdf', [UserController::class, 'exportHistoryAsPDF'])->name('history.pdf');
     Route::get('/pending', [UserController::class, 'pendingRequests'])->name('pending');
+    Route::get('/user/pending', [UserController::class, 'pendingRequests'])->name('user.pending');
     Route::put('/pending/update/{id}', [UserController::class, 'updatePendingRequest'])->name('pending.update');
     Route::delete('/pending/cancel/{id}', [UserController::class, 'cancelRequest'])->name('pending.cancel');
     Route::get('/pending/edit/{id}', [UserController::class, 'editPendingRequest'])->name('pending.edit');
-
-
 });
 
 // Route สำหรับ Admin
@@ -52,7 +51,8 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/damage/requests', [AdminController::class, 'showDamageRequests'])->name('damage.requests');
     Route::patch('/damage/approve/{id}', [AdminController::class, 'approveDamageRequest'])->name('damage.approve');
     Route::patch('/damage/reject/{id}', [AdminController::class, 'rejectDamageRequest'])->name('damage.reject');
-});
+    Route::get('/borrow-history/pdf', [AdminController::class, 'exportBorrowHistoryPDF'])->name('borrow.history.pdf');});
+
 
 // Route สำหรับโปรไฟล์
 Route::middleware('auth')->group(function () {
