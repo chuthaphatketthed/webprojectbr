@@ -33,7 +33,7 @@
                     <td class="border px-4 py-2 text-center">{{ $request->description }}</td>
                     <td class="border px-4 py-2 text-center">
                         @if($request->image_path)
-                            <img src="{{ asset('storage/' . $request->image_path) }}" alt="รูปภาพอุปกรณ์ชำรุด" class="w-32 h-32 object-cover mx-auto rounded shadow">
+                        <img src="{{ Storage::url($request->image_path) }}" alt="รูปภาพอุปกรณ์ชำรุด" class="w-32 h-32 object-cover mx-auto rounded shadow">
                         @else
                             <p class="text-gray-500">ไม่มีรูปภาพ</p>
                         @endif

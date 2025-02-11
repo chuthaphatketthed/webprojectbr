@@ -9,22 +9,43 @@
             font-weight: normal;
             src: url("{{ storage_path('fonts/THSarabunNew.ttf') }}") format('truetype');
         }
+        @font-face {
+            font-family: 'THSarabunNew';
+            font-style: bold;
+            font-weight: bold;
+            src: url("{{ storage_path('fonts/THSarabunNew-Bold.ttf') }}") format('truetype');
+}
         body {
             font-family: "THSarabunNew", sans-serif;
+            font-size: 16px;
+            text-align: center;
+        }
+        h2 {
+            font-family: "THSarabunNew-Bold", sans-serif;
+            font-size: 24px;
+            font-weight: normal;
+            text-align: center;
+            margin-bottom: 20px;
         }
         table {
             width: 100%;
             border-collapse: collapse;
+            border-spacing: 0;
+            margin-top: 20px;
         }
         th, td {
             border: 1px solid black;
             padding: 8px;
             text-align: center;
+            font-weight: normal;
+        }
+        th {
+            background-color: #f2f2f2;
         }
     </style>
 </head>
 <body>
-    <h2>ประวัติการยืม-คืนครุภัณฑ์</h2>
+    <h2 style="font-family: 'THSarabunNew', sans-serif;">ประวัติการยืม-คืนครุภัณฑ์</h2>
     <table>
         <thead>
             <tr>
@@ -58,7 +79,7 @@
                         @default {{ ucfirst($request->status) }}
                     @endswitch
                 </td>
-                <td>{{ $request->created_at->format('d/m/Y') }}</td>
+                <td>{{ \Carbon\Carbon::parse($request->created_at)->format('d/m/Y') }}</td>
             </tr>
             @endforeach
         </tbody>

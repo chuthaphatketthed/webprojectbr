@@ -2,20 +2,14 @@
 
 @section('content')
 <div class="container mx-auto p-6">
-    <h1 class="text-2xl font-bold mb-4">ประวัติการยืม-คืนครุภัณฑ์</h1>
+    <!-- ใช้ flex เพื่อให้หัวข้อและตัวกรองอยู่ในแนวเดียวกัน -->
+    <div class="flex items-center justify-between mb-4">
+        <h1 class="text-2xl font-bold">ประวัติการยืม-คืนครุภัณฑ์</h1>
 
-    <!-- แสดงข้อความแจ้งเตือนเมื่อทำรายการสำเร็จ -->
-    @if(session('success'))
-        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-2 rounded relative mb-4">
-            {{ session('success') }}
-        </div>
-    @endif
-
-    <!-- Dropdown Filter -->
-    <div class="flex justify-end mb-4">
-        <form method="GET" action="{{ route('user.history') }}">
-            <label for="status" class="mr-2">กรองตามสถานะ:</label>
-            <select name="status" id="status" class="border border-gray-300 rounded-md shadow-sm" onchange="this.form.submit()">
+        <!-- Dropdown Filter -->
+        <form method="GET" action="{{ route('user.history') }}" class="flex items-center space-x-2">
+            <label for="status" class="text-gray-700 font-medium">กรองตามสถานะ:</label>
+            <select name="status" id="status" class="border border-gray-300 rounded-md shadow-sm p-1" onchange="this.form.submit()">
                 <option value="all" {{ isset($selectedStatus) && $selectedStatus == 'all' ? 'selected' : '' }}>ทั้งหมด</option>
                 <option value="return_pending" {{ isset($selectedStatus) && $selectedStatus == 'return_pending' ? 'selected' : '' }}>คืนแล้ว</option>
                 <option value="pending" {{ isset($selectedStatus) && $selectedStatus == 'pending' ? 'selected' : '' }}>กำลังรออนุมัติ</option>
@@ -27,6 +21,13 @@
             </select>
         </form>
     </div>
+
+    <!-- แสดงข้อความแจ้งเตือนเมื่อทำรายการสำเร็จ -->
+    @if(session('success'))
+        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-2 rounded relative mb-4">
+            {{ session('success') }}
+        </div>
+    @endif
 
     <!-- Table -->
     <table class="table-auto w-full border border-blue-300">
