@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\User;
 use App\Models\BorrowRequest;
 use App\Models\Equipment;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -148,4 +149,16 @@ class AdminController extends Controller
 
         return $pdf->stream('borrow-history.pdf');
     }
+    public function showUser($id)
+    {
+        // ดึงข้อมูลผู้ใช้ และอุปกรณ์ที่กำลังยืมอยู่ (ไม่รวมที่กำลังรอคืน)
+        $user = User::with(['borrowRequests' => function ($query) {
+            $query->where('status', 'approved') // แสดงเฉพาะที่ยังยืมอยู่จริง ๆ
+                  ->with('equipment'); // ดึงข้อมูลอุปกรณ์ที่ถูกยืมด้วย
+        }])->findOrFail($id);
+    
+        return view('admin.user_profile', compact('user'));
+    }
+    
+
 }

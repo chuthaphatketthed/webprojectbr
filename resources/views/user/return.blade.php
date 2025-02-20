@@ -21,14 +21,14 @@
         </div>
     @endif
 
-    <form method="POST" action="{{ route('user.return') }}" enctype="multipart/form-data" class="space-y-4">
+    <form method="POST" action="{{ route('user.return', ['id' => $equipment->id]) }}" enctype="multipart/form-data" class="space-y-4">
         @csrf
 
         <div>
             <label for="id" class="block text-sm font-medium text-gray-700">เลือกครุภัณฑ์ที่ต้องการคืน:</label>
             <select name="id" id="id" required class="border border-gray-300 px-3 py-2 rounded w-full focus:ring-2 focus:ring-blue-500">
                 @foreach ($borrowedItems as $item)
-                    <option value="{{ $item->id }}">{{ $item->equipment->name }}</option>
+                    <option value="{{ $item->id }}">{{ $item->equipment->name }} ({{ $item->quantity }} ชิ้น)</option>
                 @endforeach
             </select>
         </div>
@@ -39,7 +39,7 @@
         </div>
 
         <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
-            ส่งข้อมูลการคืน
+            ยืนยันการคืน
         </button>
     </form>
 </div>

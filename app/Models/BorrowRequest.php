@@ -31,6 +31,6 @@ class BorrowRequest extends Model
     // ความสัมพันธ์กับอุปกรณ์
     public function equipment()
     {
-        return $this->belongsTo(Equipment::class);
+        return $this->belongsTo(Equipment::class, 'equipment_id');
     }
 }

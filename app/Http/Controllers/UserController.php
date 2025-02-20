@@ -12,64 +12,64 @@ class UserController extends Controller
     // แสดงรายการอุปกรณ์ทั้งหมด
     public function equipmentList()
     {
-        $equipments = Equipment::all();
+        $equipments = Equipment::all()->fresh();
         return view('user.equipment', compact('equipments'));
     }
 
     // ฟังก์ชันสำหรับยืมอุปกรณ์
     public function borrow(Request $request)
     {
-        $request->validate([
-            'equipment_id' => 'required|exists:equipment,id',
-            'quantity' => 'required|integer|min:1',
-            'reason' => 'required|string|max:255',
-        ]);
+    $request->validate([
+        'equipment_id' => 'required|exists:equipment,id',
+        'quantity' => 'required|integer|min:1',
+        'reason' => 'required|string|max:255',
+    ]);
 
         $equipment = Equipment::findOrFail($request->equipment_id);
 
-        if ($equipment->quantity < $request->quantity) {
-            return redirect()->back()->withErrors(['quantity' => 'จำนวนอุปกรณ์ไม่เพียงพอ']);
-        }
+    //  สร้างคำขอการยืม (แต่ยังไม่ลดจำนวนอุปกรณ์)
+    BorrowRequest::create([
+        'user_id' => Auth::id(),
+        'equipment_id' => $request->equipment_id,
+        'quantity' => $request->quantity,
+        'status' => 'pending', // ❗️รออนุมัติจากแอดมิน
+        'reason' => $request->reason,
+    ]);
 
-        // ลดจำนวนคงเหลือของอุปกรณ์
-        $equipment->decrement('quantity', $request->quantity);
-
-        // บันทึกคำขอการยืม
-        BorrowRequest::create([
-            'user_id' => Auth::id(),
-            'equipment_id' => $request->equipment_id,
-            'quantity' => $request->quantity,
-            'status' => 'pending',
-            'reason' => $request->reason,
-        ]);
-
-        return redirect()->route('user.equipment')->with('success', 'คำขอยืมได้ถูกส่งเรียบร้อยแล้ว');
+    return redirect()->route('user.equipment')->with('success', 'คำขอถูกส่งแล้ว กรุณารอการอนุมัติจากแอดมิน');
     }
 
     // ฟังก์ชันสำหรับคืนอุปกรณ์
-    public function return(Request $request)
-    {
-        $request->validate([
-            'id' => 'required|exists:borrow_requests,id',
-            'return_proof' => 'required|image|mimes:jpeg,png,jpg|max:2048',
-        ]);
+    public function return(Request $request, $id)
+{
+    $request->validate([
+        'id' => 'required|exists:borrow_requests,id',
+        'return_proof' => 'required|image|mimes:jpeg,png,jpg|max:2048',
+    ]);
 
-        $borrowRequest = BorrowRequest::findOrFail($request->id);
+    $borrowRequest = BorrowRequest::findOrFail($request->id);
 
-        if ($borrowRequest->status !== 'approved') {
-            return redirect()->back()->with('error', 'ไม่สามารถคืนอุปกรณ์ได้');
-        }
-
-        $borrowRequest->update([
-            'status' => 'return_pending',
-            'return_proof' => $request->file('return_proof')->store('proofs'),
-        ]);
-
-        $equipment = Equipment::findOrFail($borrowRequest->equipment_id);
-        $equipment->increment('quantity', $borrowRequest->quantity);
-
-        return redirect()->route('user.history')->with('success', 'การคืนอุปกรณ์เสร็จสมบูรณ์');
+    if ($borrowRequest->status !== 'approved') {
+        return redirect()->back()->with('error', 'ไม่สามารถคืนอุปกรณ์ได้');
     }
+
+    $proofPath = $request->file('return_proof')->store('proofs');
+
+    //  อัปเดตสถานะเป็น return_pending
+    $borrowRequest->update([
+        'status' => 'return_pending',
+        'return_proof' => $proofPath,
+    ]);
+
+    //  เพิ่มจำนวนอุปกรณ์กลับไป
+    $equipment = Equipment::findOrFail($borrowRequest->equipment_id);
+    $equipment->increment('quantity', $borrowRequest->quantity);
+    $equipment->save(); // บันทึกการเปลี่ยนแปลง
+
+    //  เปลี่ยนจาก user.history เป็น user.equipment เพื่อให้หน้าอัปเดตข้อมูล
+    return redirect()->route('user.equipment')->with('success', 'การคืนอุปกรณ์เสร็จสมบูรณ์');
+}
+
 
     // แสดงประวัติการยืม
     public function history(Request $request)
@@ -186,4 +186,21 @@ class UserController extends Controller
 
         return redirect()->route('user.pending')->with('success', 'แก้ไขคำขอเรียบร้อยแล้ว');
     }
+    // แสดงฟอร์มคืนอุปกรณ์
+public function showReturnForm($id)
+{
+    $borrowedItems = BorrowRequest::where('user_id', Auth::id())
+                                  ->where('equipment_id', $id)
+                                  ->where('status', 'approved')
+                                  ->with('equipment') // ดึงข้อมูลอุปกรณ์ที่ถูกยืมมา
+                                  ->get();
+
+    if ($borrowedItems->isEmpty()) {
+        return redirect()->route('user.equipment')->with('error', 'ไม่มีอุปกรณ์ที่สามารถคืนได้');
+    }
+
+    $equipment = Equipment::findOrFail($id);
+    return view('user.return', compact('equipment', 'borrowedItems'));
+}
+
 }

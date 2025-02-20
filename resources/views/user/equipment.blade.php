@@ -24,7 +24,7 @@
                 <th class="border border-gray-300 px-4 py-2">ชื่ออุปกรณ์</th>
                 <th class="border border-gray-300 px-4 py-2">จำนวน</th>
                 <th class="border border-gray-300 px-4 py-2">รายละเอียด</th>
-                <th class="border border-gray-300 px-4 py-2">กรอกรายละเอียด</th>
+                <th class="border border-gray-300 px-4 py-2">การดำเนินการ</th>
             </tr>
         </thead>
         <tbody>
@@ -48,11 +48,11 @@
                             </button>
                         </form>
                         @else
-                        <span class="text-red-500">Out of stock</span>
+                        <span class="text-red-500"></span>
                         @endif
 
                         <!-- Return Form -->
-                        <form method="GET" action="{{ route('user.return.form', $equipment->id) }}">
+                        <form method="GET" action="{{ route('user.return', ['id' => $equipment->id]) }}">
                             @csrf
                             <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 w-full">
                                 ต้องการคืน

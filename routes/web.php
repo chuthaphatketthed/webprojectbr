@@ -5,6 +5,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Response;
 
 // หน้า Welcome
 Route::get('/', function () {
@@ -27,7 +28,7 @@ Route::middleware(['auth'])->group(function () {
 Route::middleware(['auth', 'role:user'])->prefix('user')->name('user.')->group(function () {
     Route::get('/dashboard', [UserController::class, 'equipmentList'])->name('equipment');
     Route::post('/borrow', [UserController::class, 'borrow'])->name('borrow');
-    Route::post('/return', [UserController::class, 'return'])->name('return');
+    Route::post('/return/{id}', [UserController::class, 'return'])->name('return');
     Route::get('/history', [UserController::class, 'history'])->name('history');
     Route::get('/return/{id}', [UserController::class, 'showReturnForm'])->name('return.form');
     Route::get('/report/damage', [UserController::class, 'showReportDamageForm'])->name('report.damage.form');
@@ -38,6 +39,8 @@ Route::middleware(['auth', 'role:user'])->prefix('user')->name('user.')->group(f
     Route::put('/pending/update/{id}', [UserController::class, 'updatePendingRequest'])->name('pending.update');
     Route::delete('/pending/cancel/{id}', [UserController::class, 'cancelRequest'])->name('pending.cancel');
     Route::get('/pending/edit/{id}', [UserController::class, 'editPendingRequest'])->name('pending.edit');
+    Route::get('/user/{id}', [UserController::class, 'showUser'])->name('user.show');
+    Route::post('/return', [UserController::class, 'return'])->name('user.return');
 });
 
 // Route สำหรับ Admin
@@ -51,8 +54,9 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/damage/requests', [AdminController::class, 'showDamageRequests'])->name('damage.requests');
     Route::patch('/damage/approve/{id}', [AdminController::class, 'approveDamageRequest'])->name('damage.approve');
     Route::patch('/damage/reject/{id}', [AdminController::class, 'rejectDamageRequest'])->name('damage.reject');
-    Route::get('/borrow-history/pdf', [AdminController::class, 'exportBorrowHistoryPDF'])->name('borrow.history.pdf');});
-
+    Route::get('/borrow-history/pdf', [AdminController::class, 'exportBorrowHistoryPDF'])->name('borrow.history.pdf');
+    Route::get('/user/{id}', [AdminController::class, 'showUser'])->name('user.profile');
+});
 
 // Route สำหรับโปรไฟล์
 Route::middleware('auth')->group(function () {
@@ -60,6 +64,17 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
+
+// Route แสดงรูปภาพจาก Storage
+Route::get('/show-image/{filename}', function ($filename) {
+    $path = storage_path('app/public/damage_reports/' . $filename);
+    
+    if (!file_exists($path)) {
+        abort(404);
+    }
+    
+    return Response::file($path);
+})->name('show.image');
 
 // Auth Routes
 Auth::routes();
