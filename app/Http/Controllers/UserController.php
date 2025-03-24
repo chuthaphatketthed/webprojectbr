@@ -202,5 +202,17 @@ public function showReturnForm($id)
     $equipment = Equipment::findOrFail($id);
     return view('user.return', compact('equipment', 'borrowedItems'));
 }
+    public function cancelRequest($id)
+{
+    $borrowRequest = BorrowRequest::where('id', $id)
+        ->where('user_id', Auth::id())
+        ->where('status', 'pending')
+        ->firstOrFail();
+
+    $borrowRequest->delete(); // ลบคำขอที่รอดำเนินการ
+
+    return redirect()->route('user.pending')->with('success', 'ยกเลิกคำขอสำเร็จ');
+}
+    
 
 }
